@@ -1,0 +1,12 @@
+name: FakeBuildings
+version: '1.0-SNAPSHOT'
+main: com.dami.fakeBuildings.FakeBuildings
+api-version: '1.21'
+authors: [ Dami ]
+description: FakeBuildings plugin
+commands:
+  buildingschematic:
+    description: FakeBuildings command
+    usage: /BuildingSchematic
+    permission: BuildingSchematic.use
+    aliases: [ bs ]
