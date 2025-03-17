@@ -1,5 +1,7 @@
 package com.dami.fakeBuildings.Commands;
 
+import com.dami.fakeBuildings.BuildingInitializations.BuildingSchematic;
+import com.dami.fakeBuildings.BuildingInitializations.BuildingSchematicCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -31,7 +33,14 @@ public class BuildingSchematicCommand implements TabExecutor {
 
         if(args.length == 1){
             if(args[0].equalsIgnoreCase("create")){
-                //create building schematic
+                BuildingSchematic schem = BuildingSchematicCreator.createBuildingSchematic(player.getUniqueId());
+
+                if(schem == null){
+                    player.sendMessage("You must set both positions and a building name");
+                    return false;
+                }
+
+                schem.saveToFileAsync("test");
                 return true;
             }
             if(args[0].equalsIgnoreCase("delete")){
@@ -43,11 +52,11 @@ public class BuildingSchematicCommand implements TabExecutor {
                 return true;
             }
             if(args[0].equalsIgnoreCase("pos1")){
-                //set position 1
+                BuildingSchematicCreator.setPos1(player.getUniqueId(), player.getLocation());
                 return true;
             }
             if(args[0].equalsIgnoreCase("pos2")){
-                //set position 2
+                BuildingSchematicCreator.setPos2(player.getUniqueId(), player.getLocation());
                 return true;
             }
         }

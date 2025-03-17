@@ -1,8 +1,8 @@
 package com.dami.fakeBuildings.FakeBuilding;
 
 import com.dami.fakeBuildings.BuildingInitializations.BuildingSchematic;
-import com.dami.fakeBuildings.ConfigReload.Savable;
 import com.dami.fakeBuildings.Gui.BuildingListGUI;
+import com.dami.fakeBuildings.yml.Savable;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -100,11 +100,6 @@ public class FakeBuildingManager extends Savable {
         door.loadFromConfig(config.getConfigurationSection("door"));
     }
 
-    @Override
-    public void loadBaseConfig() {
-        // Not needed
-    }
-
     public static FakeBuildingManager getFakeBuildingManager(String buildingName) {
         for (FakeBuildingManager fakeBuildingManager : fakeBuildingManagers) {
             if (fakeBuildingManager.getBuildingName().equals(buildingName)) {
@@ -186,11 +181,6 @@ public class FakeBuildingManager extends Savable {
             for (String tempString : temp) {
                 FakeBuildingManager.addFakeBuildingManager(FakeBuildingManager.getFakeBuildingManager(tempString));
             }
-        }
-
-        @Override
-        public void loadBaseConfig() {
-            // Not needed
         }
     }
 }

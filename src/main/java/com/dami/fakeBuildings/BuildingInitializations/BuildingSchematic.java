@@ -1,7 +1,7 @@
 package com.dami.fakeBuildings.BuildingInitializations;
 
-import com.dami.fakeBuildings.ConfigReload.Savable;
 import com.dami.fakeBuildings.FakeBuilding.Door;
+import com.dami.fakeBuildings.yml.Savable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class BuildingSchematic extends Savable {
 
+    private static Map<String, BuildingSchematic> buildingSchematics = new HashMap<>();
+
     private Vector metrics;
 
     private List<Integer> blocks;
@@ -20,9 +22,11 @@ public class BuildingSchematic extends Savable {
 
     private List<Door> doors;
 
-    public BuildingSchematic(Vector metrics, List<Integer> blocks) {
+    public BuildingSchematic(String name, Vector metrics, List<Integer> blocks) {
         this.metrics = metrics;
         this.blocks = blocks;
+
+        buildingSchematics.put(name, this);
     }
 
 
@@ -84,10 +88,5 @@ public class BuildingSchematic extends Savable {
             door.loadFromConfig(doorSection);
             doors.add(door);
         }
-    }
-
-    @Override
-    public void loadBaseConfig() {
-
     }
 }

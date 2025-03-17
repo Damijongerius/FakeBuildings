@@ -1,4 +1,4 @@
-package com.dami.fakeBuildings.ConfigReload;
+package com.dami.fakeBuildings.yml;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -6,13 +6,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class Savable{
+public abstract class Savable {
 
     private static Set<Savable> instances = new HashSet<>();
     private final int instanceNumber;
@@ -20,23 +17,23 @@ public abstract class Savable{
 
     public abstract Map<String, Object> saveToYaml();
 
-    protected Savable() {
+    public Savable() {
         instances.add(this);
         instanceNumber = getInstances(this.getClass()).size();
     }
 
-    public static void setJavaPlugin(JavaPlugin plugin){
+    public static void ref(JavaPlugin plugin){
         Savable.plugin = plugin;
     }
 
 
     public CompletableFuture<Void> saveToFileAsync() {
-        return saveToFileAsync(instanceNumber + "-");
+        return saveToFileAsync(instanceNumber + "");
     }
 
     public CompletableFuture<Void> saveToFileAsync(String name) {
         return CompletableFuture.runAsync(() -> {
-            String filePath = plugin.getDataFolder() + File.separator + name + ".yml";
+            String filePath = plugin.getDataFolder() + File.separator + this.getClass().getSimpleName() + File.separator + name + ".yml";
             File file = new File(filePath);
 
             // Create the directory structure if it doesn't exist
@@ -80,17 +77,15 @@ public abstract class Savable{
     }
 
     public static <T extends Savable> T loadFromFile(Class<T> clazz, String fileName) {
-
-        File file = new File(plugin.getDataFolder() + File.separator + fileName + ".yml");
+        File file = new File(plugin.getDataFolder() + File.separator + fileName);
         if (file.exists()) {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
             return fromYamlConfig(clazz, config);
         }
-
         return null;
     }
 
-    protected static <T extends Savable> T fromYamlConfig(Class<T> clazz, YamlConfiguration config) {
+    private static <T extends Savable> T fromYamlConfig(Class<T> clazz, YamlConfiguration config) {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             instance.loadFromConfig(config.getConfigurationSection("data"));
@@ -103,9 +98,8 @@ public abstract class Savable{
 
     public abstract void loadFromConfig(ConfigurationSection config);
 
-
-    public static <String,T extends Savable>  Map<String,T> loadFromFolder(Class<T> clazz, String folderName) {
-        Map<String,T> resultList = new HashMap<>();
+    public static <T extends Savable> List<T> loadFromFolder(Class<T> clazz, String folderName) {
+        List<T> resultList = new ArrayList<>();
 
         File folder = new File(plugin.getDataFolder() + File.separator + folderName);
         File[] files = folder.listFiles();
@@ -114,10 +108,9 @@ public abstract class Savable{
             for (File file : files) {
                 if (file.isFile() && file.getName().endsWith(".yml")) {
                     try {
-                        String fileName = (String) file.getName().substring(0,file.getName().length() - 4);
-                        T loadedObject = loadFromFile(clazz, folderName + File.separator + fileName);
+                        T loadedObject = loadFromFile(clazz, folderName + File.separator + file.getName());
                         if (loadedObject != null) {
-                            resultList.put(fileName,loadedObject);
+                            resultList.add(loadedObject);
                         }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -128,6 +121,4 @@ public abstract class Savable{
 
         return resultList;
     }
-
-    public abstract void loadBaseConfig();
 }
