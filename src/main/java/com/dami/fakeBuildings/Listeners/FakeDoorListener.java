@@ -1,7 +1,6 @@
 package com.dami.fakeBuildings.Listeners;
 
 import com.dami.fakeBuildings.FakeBuilding.FakeBuildingManager;
-import com.dami.handlers.SaveHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -23,7 +22,7 @@ public class FakeDoorListener implements Listener {
         FakeBuildingManager manager = FakeBuildingManager.meetsCriteria(event.getClickedBlock());
 
         if(manager != null){
-            manager.PlayerClickedDoor(event.getPlayer());
+            manager.playerClickedDoor(event.getPlayer());
         }
     }
 }

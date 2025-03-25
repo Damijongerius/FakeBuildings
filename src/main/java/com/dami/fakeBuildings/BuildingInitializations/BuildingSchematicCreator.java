@@ -1,8 +1,10 @@
 package com.dami.fakeBuildings.BuildingInitializations;
 
+import com.dami.fakeBuildings.Listeners.DoorCreateClicksListener;
+import com.dami.fakeBuildings.Structure.BuildingSchematic;
+import com.dami.fakeBuildings.Structure.Door;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -10,6 +12,10 @@ import java.util.*;
 public class BuildingSchematicCreator {
 
     private static final Map<UUID,PlayerBuildingSettings> playerBuildingSettings = new HashMap<>();
+
+    private BuildingSchematicCreator() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static PlayerBuildingSettings getPlayerBuildingSettings(UUID uuid){
         return playerBuildingSettings.get(uuid);
@@ -33,6 +39,12 @@ public class BuildingSchematicCreator {
         settings.setBuildingName(buildingName);
     }
 
+    public static void setDoorSettings(UUID uuid, DoorCreateClicksListener.PlayerDoorSettings doorSettings){
+        PlayerBuildingSettings settings = playerBuildingSettings.computeIfAbsent(uuid, k -> new PlayerBuildingSettings());
+
+        settings.doorSettings = doorSettings;
+    }
+
     public static BuildingSchematic createBuildingSchematic(UUID uuid){
         PlayerBuildingSettings settings = playerBuildingSettings.get(uuid);
 
@@ -48,7 +60,15 @@ public class BuildingSchematicCreator {
                 Math.abs(settings.pos1.getBlockZ() - settings.pos2.getBlockZ())
         );
 
-        return new BuildingSchematic(settings.buildingName,size,blocks);
+        BuildingSchematic schematic = new BuildingSchematic(settings.buildingName,size,blocks);
+
+        if(settings.doorSettings != null){
+            Vector start = settings.doorSettings.doorPos1;
+            Vector end = settings.doorSettings.doorpos2;
+            schematic.door = new Door(start,end,settings.doorSettings.doorMaterials);
+        }
+
+        return schematic;
     }
 
     private static List<Integer> getBlocksInArea(Location pos1, Location pos2){
@@ -77,11 +97,13 @@ public class BuildingSchematicCreator {
 
     public static class PlayerBuildingSettings{
 
-        protected Location pos1;
+        public Location pos1;
 
-        protected Location pos2;
+        public Location pos2;
 
-        protected String buildingName;
+        public String buildingName;
+
+        public DoorCreateClicksListener.PlayerDoorSettings doorSettings;
 
         public void setPos1(Location pos1) {
             this.pos1 = pos1;
